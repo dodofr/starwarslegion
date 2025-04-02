@@ -1,32 +1,35 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const EbookModel = require("../models/ebooks");
-const CategorieModel = require("../models/categorie");
-const SerieModel = require("../models/serie");
-const BibliothequeModel = require("../models/bibliotheque");
-const UserModel = require("../models/user");
-const AuteurModel = require('../models/auteur');
 
-const sequelize = new Sequelize(`mariadb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:3305/${process.env.DB_NAME}`, {
+// Importer les modèles
+const VaisseauModel = require("../models/vaisseau");
+const CadranModel = require("../models/cadran");
+const CarteModel = require("../models/carte");
+const FactionModel = require("../models/faction");
+const CategorieTailleModel = require("../models/categorieTaille");
+const ImageVaisseauModel = require("../models/imageVaisseau"); // Import du modèle ImageVaisseau
+
+// Créer la connexion à la base de données MariaDB
+const sequelize = new Sequelize(`mariadb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`, {
     dialectOptions: {
         connectTimeout: 60000, // Augmenter le délai d'attente à 60 secondes
     }
 });
 
 // Initialisation des modèles
-const Ebook = EbookModel(sequelize, DataTypes);
-const Serie = SerieModel(sequelize, DataTypes);
-const Categorie = CategorieModel(sequelize, DataTypes);
-const Bibliotheque = BibliothequeModel(sequelize, DataTypes);
-const User = UserModel(sequelize, DataTypes);
-const Auteur = AuteurModel(sequelize, DataTypes);
+const Vaisseau = VaisseauModel(sequelize, DataTypes);
+const Cadran = CadranModel(sequelize, DataTypes);
+const Carte = CarteModel(sequelize, DataTypes);
+const Faction = FactionModel(sequelize, DataTypes);
+const CategorieTaille = CategorieTailleModel(sequelize, DataTypes);
+const ImageVaisseau = ImageVaisseauModel(sequelize, DataTypes); // Initialisation du modèle ImageVaisseau
 
-// Appeler les fonctions d'association
-Ebook.associate({ Serie, Categorie, User, Bibliotheque,Auteur });
-Serie.associate({ Ebook });
-Categorie.associate({ Ebook });
-User.associate({ Bibliotheque, Ebook });
-Bibliotheque.associate({ User, Ebook });
-Auteur.associate({ Ebook });
+// Appeler les fonctions d'association pour chaque modèle
+Vaisseau.associate({ Faction, Cadran, Carte, CategorieTaille, ImageVaisseau }); // Ajout de la relation avec ImageVaisseau
+Cadran.associate({ Vaisseau });
+Carte.associate({ Vaisseau });
+Faction.associate({ Vaisseau });
+CategorieTaille.associate({ Vaisseau });
+ImageVaisseau.associate({ Vaisseau }); // L'association entre ImageVaisseau et Vaisseau
 
 // Fonction d'initialisation/synchronisation de la base de données
 const initDb = async () => {
@@ -43,10 +46,10 @@ const initDb = async () => {
 
 module.exports = {
     initDb,
-    Ebook,
-    Serie,
-    Categorie,
-    User,
-    Bibliotheque,
-    Auteur
+    Vaisseau,
+    Cadran,
+    Carte,
+    Faction,
+    CategorieTaille,
+    ImageVaisseau // Ajout du modèle ImageVaisseau à l'export
 };
